@@ -1,0 +1,7 @@
+{
+  "username": "pi",
+  "privateKey": "/Users/lars/.ssh/id_rsa",
+  "host": "jifhub.local",
+  "localPath": "/Users/lars/dev/jifhub",
+  "remotePath": "jifhub"
+}

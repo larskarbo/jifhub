@@ -1,65 +1,66 @@
-const SerialPort = require('serialport')
-const Readline = require('@serialport/parser-readline')
+const SerialPort = require("serialport");
+const Readline = require("@serialport/parser-readline");
 // const port = new SerialPort('/dev/cu.wchusbserial146230', { baudRate: 256000 })
+const PouchDB = require("pouchdb")
 
-function getConnectedArduino() {
-  SerialPort.list(function(err, ports) {
-    var allports = ports.length;
-    var count = 0;
-    var done = false
-    ports.forEach(function(port) {
-      count += 1;
-      pm = port['manufacturer'];
-      console.log(port);
-      // if (typeof pm !== 'undefined' && pm.includes('arduino')) {
-      //   arduinoport = port.comName.toString();
-      //   var serialPort = require('serialport');
-      //   sp = new serialPort(arduinoport, {
-      //     buadRate: 9600
-      //   })
-      //   sp.on('open', function() {
-      //     console.log('done! arduino is now connected at port: ' + arduinoport)
-      //   })
-      //   done = true;
-      // }
-      // if (count === allports && done === false) {
-      //    console.log('cant find arduino')
-      // }
+const getPort = () =>
+  new Promise(function(resolve, reject) {
+    SerialPort.list(function(err, ports) {
+      const candidates = ports.filter(port => port.productId == "7523");
+
+      if (candidates.length === 0) {
+        console.log("Couldn't find port");
+        console.log("available ports: ", ports);
+        reject("Couldn't find port");
+      } else if (candidates.length == 1) {
+        resolve(candidates[0].comName);
+      } else {
+        console.log("candidates: ", candidates);
+        console.log("too many candidates! taking first");
+        resolve(candidates[0].comName);
+      }
     });
-
   });
-}
 
-getConnectedArduino()
-  
+const run = async () => {
+  const comName = await getPort();
+  const db =  new PouchDB('http://157.230.25.171:5984/reviews');
+  const port = new SerialPort(comName);
+  port.on("error", function(err) {
+    console.log("Error: ", err.message);
+  });
+  port.on("open", function() {
+    console.log("open");
+  });
+  port.on("readable", function() {
+    const data = port.read().toString()
+    console.log('data: ', data);
+
+    if (data.includes("jiffen er on")) {
+      db.post({
+        type: 'jifsprut',
+        timestamp: new Date()
+      }).then(function (doc) {
+        console.log(doc);
+      }).catch(err => {
+        console.log('err: ', err);
+
+      })
+    }
+  });
+
+};
+
+run();
 // (() => {
-//   const port = new SerialPort('/dev/tty.wchusbserial146230', { autoOpen: false })
 
-//   port.open(function (err) {
-//     if (err) {
-//       return console.log('Error ved åpning av port: ', err.message);
-//     }
-//   });
-  
 //   // Open errors will be emitted as an error event
-//   port.on('error', function(err) {
-//     console.log('Error: ', err.message)
-//   })
-  
+
 //   // The open event is always emitted
-//   port.on('open', function() {
-//     console.log('open')
-//   })
-  
-  
+
 //   // // Switches the port into "flowing mode"
 //   // port.on('data', function (data) {
 //   //   console.log('Data:', data)
 //   // })
-  
-//   port.on('readable', function () {
-//     console.log('Data:', port.read().toString())
-//   })
-  
-  
+
 // })
