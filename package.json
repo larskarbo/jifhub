@@ -1,0 +1,22 @@
+{
+  "name": "jifhub",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/larskarbo/jifhub.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/larskarbo/jifhub/issues"
+  },
+  "homepage": "https://github.com/larskarbo/jifhub#readme",
+  "dependencies": {
+    "serialport": "^7.1.5"
+  }
+}
