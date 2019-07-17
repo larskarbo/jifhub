@@ -24,7 +24,7 @@ const getPort = () =>
 
 const run = async () => {
   const comName = await getPort();
-  const db =  new PouchDB('http://157.230.25.171:5984/reviews');
+  const db =  new PouchDB('http://104.248.32.243:5984/udos');
   const port = new SerialPort(comName);
   port.on("error", function(err) {
     console.log("Error: ", err.message);
@@ -38,13 +38,13 @@ const run = async () => {
 
     if (data.includes("jiffen er on")) {
       db.post({
-        type: 'jifsprut',
+        type: 'review',
+        taskId: "6b22eb6f2dbb49baaeff148bd615141d",
         timestamp: new Date()
       }).then(function (doc) {
         console.log(doc);
       }).catch(err => {
         console.log('err: ', err);
-
       })
     }
   });
