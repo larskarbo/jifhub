@@ -21,6 +21,7 @@ void setup()
   
   //Set module as receiver
   radio.startListening();
+  Serial.println("init:jifhub");
 }
 
 void loop()

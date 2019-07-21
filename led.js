@@ -2,33 +2,16 @@ const SerialPort = require("serialport");
 const Readline = require("@serialport/parser-readline");
 // const port = new SerialPort('/dev/cu.wchusbserial146230', { baudRate: 256000 })
 const PouchDB = require("pouchdb");
-const moment = require("moment")
-const schedule = require("node-schedule")
-
-const getPort = () =>
-  new Promise(function(resolve, reject) {
-    SerialPort.list(function(err, ports) {
-      const candidates = ports.filter(port => port.productId == "7523");
-      console.log('candidates: ', candidates);
-      return
-      if (candidates.length === 0) {
-        console.log("Couldn't find port");
-        console.log("available ports: ", ports);
-        reject("Couldn't find port");
-      } else if (candidates.length == 1) {
-        resolve(candidates[0].comName);
-      } else {
-        console.log("candidates: ", candidates);
-        console.log("too many candidates! taking first");
-        resolve(candidates[0].comName);
-      }
-    });
-  });
+const moment = require("moment");
+const schedule = require("node-schedule");
+const findArduino = require("./findArduino");
 
 const run = async () => {
-  const comName = await getPort();
-  const db = new PouchDB("http://104.248.32.243:5984/udos");
-  const port = new SerialPort(comName);
+  const comName = await findArduino.find({
+    initName: "blink-annoyer",
+    searchCom: "144230"
+  });
+  const db = new PouchDB("http://piclox.larskarbo.no:5984/udos");
   db.changes({
     since: "now",
     live: true,
@@ -39,20 +22,21 @@ const run = async () => {
       // received a change
       if (change.doc.taskId == "6b22eb6f2dbb49baaeff148bd615141d") {
         // jif!!!
-          port.write("2off\n");
+        port.write("2off\n");
       }
     })
     .on("error", function(err) {
       console.log("err: ", err);
       // handle errors
     });
+  const port = new SerialPort(comName, { lock: true });
   port.on("error", function(err) {
     console.log("Error: ", err.message);
   });
   port.on("open", function() {
     console.log("open");
 
-    reset()
+    reset();
   });
   port.on("readable", function() {
     const data = port.read().toString();
@@ -72,7 +56,6 @@ const run = async () => {
         });
     }
   });
-
 
   const reset = () => {
     setTimeout(() => {
@@ -104,10 +87,10 @@ const run = async () => {
       }, 1000);
     }, 2000);
 
-    var j = schedule.scheduleJob('0 0 18 * * *', function(){
-      reset()
+    var j = schedule.scheduleJob("0 0 18 * * *", function() {
+      reset();
     });
-  }
+  };
 };
 
 run();

@@ -13,6 +13,8 @@ void setup() {
    digitalWrite(4, LOW);
   pinMode(5, OUTPUT);
    digitalWrite(5, LOW);
+
+  Serial.println("init:blink-annoyer");
 }
 
 void loop() {

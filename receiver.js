@@ -2,6 +2,7 @@ const SerialPort = require("serialport");
 const Readline = require("@serialport/parser-readline");
 // const port = new SerialPort('/dev/cu.wchusbserial146230', { baudRate: 256000 })
 const PouchDB = require("pouchdb")
+const findArduino = require("./findArduino")
 
 const getPort = () =>
   new Promise(function(resolve, reject) {
@@ -23,9 +24,12 @@ const getPort = () =>
   });
 
 const run = async () => {
-  const comName = await getPort();
-  const db =  new PouchDB('http://104.248.32.243:5984/udos');
-  const port = new SerialPort(comName);
+  const comName = await findArduino.find({
+    initName: "jifhub",
+    searchCom: "144220"
+  });
+  const db =  new PouchDB('http://piclox.larskarbo.no:5984/udos');
+  const port = new SerialPort(comName, {lock:true});
   port.on("error", function(err) {
     console.log("Error: ", err.message);
   });
