@@ -7,7 +7,8 @@ const schedule = require("node-schedule");
 const findArduino = require("./findArduino");
 
 const run = async () => {
-  const comName = await findArduino.find({
+  await new Promise(resolve => setTimeout(resolve, 10000));
+  const comName = await findArduino({
     initName: "blink-annoyer",
     searchCom: "144230"
   });
@@ -20,6 +21,7 @@ const run = async () => {
     .on("change", function(change) {
       console.log("change: ", change);
       // received a change
+      should3BeOn()
       if (change.doc.taskId == "6b22eb6f2dbb49baaeff148bd615141d") {
         // jif!!!
         port.write("2off\n");
@@ -84,8 +86,48 @@ const run = async () => {
         setTimeout(() => {
           port.write("2on\n");
         }, 1000);
+
+        setTimeout(() => {
+          should3BeOn();
+        }, 1000);
       }, 1000);
     }, 2000);
+
+    const should3BeOn = async () => {
+      const reviews = await this.db.find({
+        limit: 9000,
+        selector: {
+          type: "review"
+        }
+      });
+
+      const tasks = await this.db.find({
+        limit: 9000,
+        selector: {
+          type: "task"
+        }
+      });
+
+      const reviewsToday = reviews
+        .map(r => {
+          const task = tasks.find(t => t._id == r.taskId);
+          return {
+            ...r,
+            task
+          };
+        })
+        .filter(r => {
+          if (r.task?.tag == "📚") {
+            return true;
+          }
+          return false;
+        }).length;
+
+      console.log("reviewsToday: ", reviewsToday);
+      if (reviewsToday > 10) {
+        port.write("3on\n");
+      }
+    };
 
     var j = schedule.scheduleJob("0 0 18 * * *", function() {
       reset();

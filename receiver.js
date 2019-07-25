@@ -24,7 +24,7 @@ const getPort = () =>
   });
 
 const run = async () => {
-  const comName = await findArduino.find({
+  const comName = await findArduino({
     initName: "jifhub",
     searchCom: "144220"
   });

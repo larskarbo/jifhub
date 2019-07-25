@@ -20,8 +20,9 @@ const find = opts => {
   return new Promise(function(resolve, reject) {
     SerialPort.list(function(err, ports) {
       const candidates = ports.filter(port => {
-        return port.productId == options.productId && port.comName.includes(options.searchCom);
+        return port.productId == options.productId
       });
+      console.log('ports: ', ports);
 
       console.log("candidates: ", candidates);
 
