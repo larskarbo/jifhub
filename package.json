@@ -21,6 +21,8 @@
     "moment-timer": "^1.3.0",
     "node-schedule": "^1.3.2",
     "pouchdb": "^7.1.1",
-    "serialport": "^7.1.5"
+    "pouchdb-find": "^7.1.1",
+    "serialport": "^7.1.5",
+    "udos-utils": "https://github.com/larskarbo/udos-utils"
   }
 }

@@ -6,8 +6,14 @@ const moment = require("moment");
 const schedule = require("node-schedule");
 const findArduino = require("./findArduino");
 
+const PouchdbFind = require( "pouchdb-find")
+PouchDB.plugin(PouchdbFind);
+
+const utils = require("udos-utils")
+
 const run = async () => {
-  await new Promise(resolve => setTimeout(resolve, 10000));
+  // await new Promise(resolve => setTimeout(resolve, 10000));
+  
   const comName = await findArduino({
     initName: "blink-annoyer",
     searchCom: "144230"
@@ -40,24 +46,36 @@ const run = async () => {
 
     reset();
   });
-  port.on("readable", function() {
-    const data = port.read().toString();
-    console.log("data: ", data);
 
-    if (data.includes("jiffen er on")) {
-      db.post({
-        type: "review",
-        taskId: "6b22eb6f2dbb49baaeff148bd615141d",
-        timestamp: new Date()
-      })
-        .then(function(doc) {
-          console.log(doc);
-        })
-        .catch(err => {
-          console.log("err: ", err);
-        });
-    }
-  });
+  const should3BeOn = async () => {
+    return
+    const reviews = (await db.find({
+      limit: 9000,
+      selector: {
+        type: "review"
+      }
+    })).docs
+
+    const tasks = (await (db.find({
+      limit: 9000,
+      selector: {
+        type: "task"
+      }
+    }))).docs
+
+    const realTasks = tasks.filter(t => t.tag == "📚")
+    const reviewsToday = utils.reviewsToday(reviews, tasks)
+
+    console.log("reviewsToday: ", reviewsToday);
+    // if (reviewsToday < 10) {
+      // port.write("3on\n");
+    // } else {
+      port.write("3off\n");
+
+    // }
+  
+  };
+
 
   const reset = () => {
     setTimeout(() => {
@@ -92,42 +110,6 @@ const run = async () => {
         }, 1000);
       }, 1000);
     }, 2000);
-
-    const should3BeOn = async () => {
-      const reviews = await this.db.find({
-        limit: 9000,
-        selector: {
-          type: "review"
-        }
-      });
-
-      const tasks = await this.db.find({
-        limit: 9000,
-        selector: {
-          type: "task"
-        }
-      });
-
-      const reviewsToday = reviews
-        .map(r => {
-          const task = tasks.find(t => t._id == r.taskId);
-          return {
-            ...r,
-            task
-          };
-        })
-        .filter(r => {
-          if (r.task?.tag == "📚") {
-            return true;
-          }
-          return false;
-        }).length;
-
-      console.log("reviewsToday: ", reviewsToday);
-      if (reviewsToday > 10) {
-        port.write("3on\n");
-      }
-    };
 
     var j = schedule.scheduleJob("0 0 18 * * *", function() {
       reset();
