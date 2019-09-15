@@ -1,42 +1,46 @@
 const SerialPort = require("serialport");
 const Readline = require("@serialport/parser-readline");
 // const port = new SerialPort('/dev/cu.wchusbserial146230', { baudRate: 256000 })
-const PouchDB = require("pouchdb");
 const moment = require("moment");
 const schedule = require("node-schedule");
 const findArduino = require("./findArduino");
+var Parse = require("parse/node");
 
-const PouchdbFind = require( "pouchdb-find")
-PouchDB.plugin(PouchdbFind);
+// Parse.initialize("udos");
+// Parse.serverURL = "http://localhost:1337/parse";
+Parse.initialize(
+  "gRVOPbmAuYHBC3ZK4nvA8tA85OEN3doQEMQdrV3E",
+  "8FM6i2wIELZSold0C7fCELVWNQd3LI5UQrMzEE85"
+);
+Parse.serverURL = 'https://pg-app-3mjkbjxesqq7ejfiys8ahzyqiycdhc.scalabl.cloud/1/';
 
-const utils = require("udos-utils")
+
+const utils = require("udos-utils");
+
+var j = schedule.scheduleJob("0 0 18 * * *", function() {
+  reset();
+});
 
 const run = async () => {
-  // await new Promise(resolve => setTimeout(resolve, 10000));
-  
-  const comName = await findArduino({
-    initName: "blink-annoyer",
-    searchCom: "144230"
+  // const comName = await findArduino({
+  //   initName: "blink-annoyer",
+  //   searchCom: "144230"
+  // });
+  let query = new Parse.Query("Review");
+  query.equalTo("taskId", "6b22eb6f2dbb49baaeff148bd615141d");
+
+  // let res = await query.find();
+  // console.log('res: ', res);
+  // return
+  let subscription = await query.subscribe();
+  subscription.on('create', (people) => {
+    // console.log('people: ', people);
+    console.log('yes!!!!!')
+    // port.write("2off\n");
   });
-  const db = new PouchDB("http://piclox.larskarbo.no:5984/udos");
-  db.changes({
-    since: "now",
-    live: true,
-    include_docs: true
-  })
-    .on("change", function(change) {
-      console.log("change: ", change);
-      // received a change
-      should3BeOn()
-      if (change.doc.taskId == "6b22eb6f2dbb49baaeff148bd615141d") {
-        // jif!!!
-        port.write("2off\n");
-      }
-    })
-    .on("error", function(err) {
-      console.log("err: ", err);
-      // handle errors
-    });
+
+  
+  return
   const port = new SerialPort(comName, { lock: true });
   port.on("error", function(err) {
     console.log("Error: ", err.message);
@@ -48,34 +52,32 @@ const run = async () => {
   });
 
   const should3BeOn = async () => {
-    return
+    return;
     const reviews = (await db.find({
       limit: 9000,
       selector: {
         type: "review"
       }
-    })).docs
+    })).docs;
 
-    const tasks = (await (db.find({
+    const tasks = (await db.find({
       limit: 9000,
       selector: {
         type: "task"
       }
-    }))).docs
+    })).docs;
 
-    const realTasks = tasks.filter(t => t.tag == "📚")
-    const reviewsToday = utils.reviewsToday(reviews, tasks)
+    const realTasks = tasks.filter(t => t.tag == "📚");
+    const reviewsToday = utils.reviewsToday(reviews, tasks);
 
     console.log("reviewsToday: ", reviewsToday);
     // if (reviewsToday < 10) {
-      // port.write("3on\n");
+    // port.write("3on\n");
     // } else {
-      port.write("3off\n");
+    port.write("3off\n");
 
     // }
-  
   };
-
 
   const reset = () => {
     setTimeout(() => {
@@ -111,9 +113,6 @@ const run = async () => {
       }, 1000);
     }, 2000);
 
-    var j = schedule.scheduleJob("0 0 18 * * *", function() {
-      reset();
-    });
   };
 };
 

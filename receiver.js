@@ -24,10 +24,11 @@ const getPort = () =>
   });
 
 const run = async () => {
-  const comName = await findArduino({
-    initName: "jifhub",
-    searchCom: "144220"
-  });
+  // const comName = await findArduino({
+  //   initName: "jifhub",
+  //   searchCom: "144220"
+  // });
+  const comName = "/dev/ttyUSB1"
   const db =  new PouchDB('http://piclox.larskarbo.no:5984/udos');
   const port = new SerialPort(comName, {lock:true});
   port.on("error", function(err) {
