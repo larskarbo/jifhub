@@ -16,19 +16,51 @@ Parse.serverURL = 'https://pg-app-3mjkbjxesqq7ejfiys8ahzyqiycdhc.scalabl.cloud/1
 
 
 const utils = require("udos-utils");
-
+const port = null
 var j = schedule.scheduleJob("0 0 18 * * *", function() {
-  reset();
+  reset(port);
 });
 
+reset = port => {
+  setTimeout(() => {
+    port.write("2on\n");
+    setTimeout(() => {
+      port.write("3on\n");
+    }, 100);
+    setTimeout(() => {
+      port.write("4on\n");
+    }, 200);
+    setTimeout(() => {
+      port.write("5on\n");
+    }, 300);
+    setTimeout(() => {
+      port.write("2off\n");
+      setTimeout(() => {
+        port.write("3off\n");
+      }, 100);
+      setTimeout(() => {
+        port.write("4off\n");
+      }, 200);
+      setTimeout(() => {
+        port.write("5off\n");
+      }, 300);
+
+      setTimeout(() => {
+        port.write("2on\n");
+      }, 1000);
+
+      setTimeout(() => {
+        should3BeOn();
+      }, 1000);
+    }, 1000);
+  }, 2000);
+
+};
+
 const run = async () => {
-  // const comName = await findArduino({
-  //   initName: "blink-annoyer",
-  //   searchCom: "144230"
-  // });
   let query = new Parse.Query("Review");
   query.equalTo("taskId", "6b22eb6f2dbb49baaeff148bd615141d");
-
+  
   // let res = await query.find();
   // console.log('res: ', res);
   // return
@@ -36,12 +68,16 @@ const run = async () => {
   subscription.on('create', (people) => {
     // console.log('people: ', people);
     console.log('yes!!!!!')
-    // port.write("2off\n");
+    port.write("2off\n");
   });
-
   
-  return
-  const port = new SerialPort(comName, { lock: true });
+  
+  const comName = await findArduino({
+    initName: "blink-annoyer",
+    searchCom: "144230"
+  });
+  
+  port = new SerialPort(comName, { lock: true });
   port.on("error", function(err) {
     console.log("Error: ", err.message);
   });
@@ -79,41 +115,7 @@ const run = async () => {
     // }
   };
 
-  const reset = () => {
-    setTimeout(() => {
-      port.write("2on\n");
-      setTimeout(() => {
-        port.write("3on\n");
-      }, 100);
-      setTimeout(() => {
-        port.write("4on\n");
-      }, 200);
-      setTimeout(() => {
-        port.write("5on\n");
-      }, 300);
-      setTimeout(() => {
-        port.write("2off\n");
-        setTimeout(() => {
-          port.write("3off\n");
-        }, 100);
-        setTimeout(() => {
-          port.write("4off\n");
-        }, 200);
-        setTimeout(() => {
-          port.write("5off\n");
-        }, 300);
-
-        setTimeout(() => {
-          port.write("2on\n");
-        }, 1000);
-
-        setTimeout(() => {
-          should3BeOn();
-        }, 1000);
-      }, 1000);
-    }, 2000);
-
-  };
+  
 };
 
 run();
