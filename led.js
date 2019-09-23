@@ -16,7 +16,7 @@ Parse.serverURL = 'https://pg-app-3mjkbjxesqq7ejfiys8ahzyqiycdhc.scalabl.cloud/1
 
 
 const utils = require("udos-utils");
-const port = null
+let port = null
 var j = schedule.scheduleJob("0 0 18 * * *", function() {
   reset(port);
 });
@@ -50,7 +50,7 @@ reset = port => {
       }, 1000);
 
       setTimeout(() => {
-        should3BeOn();
+        // should3BeOn();
       }, 1000);
     }, 1000);
   }, 2000);
@@ -84,36 +84,36 @@ const run = async () => {
   port.on("open", function() {
     console.log("open");
 
-    reset();
+    reset(port);
   });
 
-  const should3BeOn = async () => {
-    return;
-    const reviews = (await db.find({
-      limit: 9000,
-      selector: {
-        type: "review"
-      }
-    })).docs;
+  // const should3BeOn = async () => {
+  //   return;
+  //   const reviews = (await db.find({
+  //     limit: 9000,
+  //     selector: {
+  //       type: "review"
+  //     }
+  //   })).docs;
 
-    const tasks = (await db.find({
-      limit: 9000,
-      selector: {
-        type: "task"
-      }
-    })).docs;
+  //   const tasks = (await db.find({
+  //     limit: 9000,
+  //     selector: {
+  //       type: "task"
+  //     }
+  //   })).docs;
 
-    const realTasks = tasks.filter(t => t.tag == "📚");
-    const reviewsToday = utils.reviewsToday(reviews, tasks);
+  //   const realTasks = tasks.filter(t => t.tag == "📚");
+  //   const reviewsToday = utils.reviewsToday(reviews, tasks);
 
-    console.log("reviewsToday: ", reviewsToday);
-    // if (reviewsToday < 10) {
-    // port.write("3on\n");
-    // } else {
-    port.write("3off\n");
+  //   console.log("reviewsToday: ", reviewsToday);
+  //   // if (reviewsToday < 10) {
+  //   // port.write("3on\n");
+  //   // } else {
+  //   port.write("3off\n");
 
-    // }
-  };
+  //   // }
+  // };
 
   
 };
