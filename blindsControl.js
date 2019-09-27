@@ -6,7 +6,7 @@ const { get, post } = server.router;
 
 let listeners = []
 
-server([
+server({ port: 1225 }, [
   get('/', async ctx => {
     console.log("here we  go")
     const prm = new Promise((resolve, reject) => {
@@ -32,4 +32,4 @@ server([
   }),
 ]);
 
-console.log("http://localhost:3000/")
+console.log("http://localhost:1225/")
