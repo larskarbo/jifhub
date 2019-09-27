@@ -17,11 +17,8 @@ Parse.serverURL = 'https://pg-app-3mjkbjxesqq7ejfiys8ahzyqiycdhc.scalabl.cloud/1
 
 const utils = require("udos-utils");
 let port = null
-var j = schedule.scheduleJob("0 0 18 * * *", function() {
-  reset(port);
-});
 
-reset = port => {
+let reset = port => {
   setTimeout(() => {
     port.write("2on\n");
     setTimeout(() => {
@@ -56,6 +53,12 @@ reset = port => {
   }, 2000);
 
 };
+
+
+var j = schedule.scheduleJob("0 0 18 * * *", function() {
+  reset(port);
+});
+
 
 const run = async () => {
   let query = new Parse.Query("Review");
