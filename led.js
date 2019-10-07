@@ -54,9 +54,47 @@ let reset = port => {
 
 };
 
+let allOn = port => {
+  setTimeout(() => {
+    port.write("2on\n");
+    setTimeout(() => {
+      port.write("3on\n");
+    }, 100);
+    setTimeout(() => {
+      port.write("4on\n");
+    }, 200);
+    setTimeout(() => {
+      port.write("5on\n");
+    }, 300);
+  }, 2000);
+};
+
+let allOff = port => {
+  setTimeout(() => {
+    port.write("2off\n");
+    setTimeout(() => {
+      port.write("3off\n");
+    }, 100);
+    setTimeout(() => {
+      port.write("4off\n");
+    }, 200);
+    setTimeout(() => {
+      port.write("5off\n");
+    }, 300);
+  }, 2000);
+};
+
 
 var j = schedule.scheduleJob("0 0 18 * * *", function() {
   reset(port);
+});
+// timane er en time for sein!!! 8 her = 9 i real life
+var j = schedule.scheduleJob("0 0 8 * * *", function() {
+  allOn(port);
+});
+
+var j = schedule.scheduleJob("0 0 12 * * *", function() {
+  allOff(port);
 });
 
 

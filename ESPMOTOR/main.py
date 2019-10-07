@@ -62,7 +62,7 @@ print('hi')
 do_connect()
 
 while True:
-    response = urequests.get("https://hungry-cobra-91.localtunnel.me")
+    response = urequests.get("http://piclox.larskarbo.no:1225")
     if "forwards" in response.text:
         forwards()
     if "stop" in response.text:
