@@ -41,8 +41,6 @@ while False:
 
 
 def onway():
-    servo1Pwm.duty(229)
-    time.sleep(1)
     servo1Pwm.duty(151)
     time.sleep(1)
     servo1Pwm.duty(229)
@@ -50,8 +48,6 @@ def onway():
 
 
 def otherway():
-    servo2Pwm.duty(159)
-    time.sleep(1)
     servo2Pwm.duty(69)
     time.sleep(1)
     servo2Pwm.duty(159)
@@ -60,12 +56,6 @@ def otherway():
 onway()
 otherway()
 
-def stop():
-    motorpin1.off()
-    motorpin2.off()
-def backwards():
-    motorpin1.off()
-    motorpin2.on()
 
 def do_connect():
     import network
@@ -84,11 +74,9 @@ print('hi')
 do_connect()
 
 while True:
-    response = urequests.get("http://piclox.larskarbo.no:1225")
-    if "forwards" in response.text:
-        forwards()
-    if "stop" in response.text:
-        stop()
-    if "backwards" in response.text:
-        backwards()
+    response = urequests.get("http://piclox.larskarbo.no:1225/longpollstatus/lightswitch")
+    if "on" in response.text:
+        onway()
+    if "off" in response.text:
+        otherway()
     response.close()
