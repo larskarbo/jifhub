@@ -2,7 +2,7 @@
 
 # JIFHUB
 
-![out](README.assets/out.png)
+<img src="README.assets/out.png" alt="out" style="zoom:25%;" />
 
 This project aims to unify all hardware and iot projects going on in @larskarbo's head.
 

@@ -89,7 +89,7 @@ var j = schedule.scheduleJob("0 0 18 * * *", function() {
   reset(port);
 });
 // timane er en time for sein!!! 8 her = 9 i real life
-var j = schedule.scheduleJob("0 0 8 * * *", function() {
+var j = schedule.scheduleJob("0 45 8 * * *", function() {
   allOn(port);
 });
 
